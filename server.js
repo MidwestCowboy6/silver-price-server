@@ -3,16 +3,22 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 
 const app = express();
+
+// Fixed CORS configuration
 app.use(cors({
-       origin: '*',
-       methods: ['GET'],
-       credentials: false
-   }));
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: false
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 const API_KEY = '09dab1d8bb5c216d1c6489e24949a2e1';
 let cachedPrice = 31.25;
 let lastUpdate = new Date();
 
-// Fetch silver price every 10 seconds
 async function updateSilverPrice() {
     try {
         const response = await fetch(`https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=XAG`);
@@ -28,15 +34,14 @@ async function updateSilverPrice() {
     }
 }
 
-// API endpoint your website will call
 app.get('/api/silver-price', (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json({
         price: cachedPrice,
         lastUpdate: lastUpdate
     });
 });
 
-// Update price immediately and then every 10 seconds
 updateSilverPrice();
 setInterval(updateSilverPrice, 10000);
 
