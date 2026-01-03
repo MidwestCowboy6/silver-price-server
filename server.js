@@ -3,8 +3,11 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 
 const app = express();
-app.use(cors()); // Allow requests from your website
-
+app.use(cors({
+       origin: '*',
+       methods: ['GET'],
+       credentials: false
+   }));
 const API_KEY = '09dab1d8bb5c216d1c6489e24949a2e1';
 let cachedPrice = 31.25;
 let lastUpdate = new Date();
